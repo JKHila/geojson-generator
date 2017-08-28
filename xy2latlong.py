@@ -65,6 +65,10 @@ def xy2latlong(_area,_maptype,_zoom,_type):
     print ("done")
     
 if __name__ == "__main__":
-    xy2latlong()
+    area=sys.argv[1]
+    maptype=sys.argv[2]
+    zoom=sys.argv[3]
+    _type = sys.argv[4]
+    xy2latlong(area,maptype,zoom,_type)
 
 

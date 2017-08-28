@@ -3,6 +3,16 @@ import sys
 import numpy as np
 from PIL import Image
 
+def removeOtherColor(img,r,g,b):
+    pixdata = img.load()
+    for y in range(img.size[1]):
+        for x in range(img.size[0]):
+            if pixdata[x, y] == (0, 116, 194, 255):
+                pixdata[x, y] = (0, 0, 0, 255)
+            else:
+                pixdata[x, y] = (255, 255, 255, 255)
+    return img
+
 def replaceColor(img,r,g,b,re):
     import numpy as np
 
@@ -22,7 +32,6 @@ def makedir(name):
 
 def makeGeoJson(_area,_maptype,_zoom,_type):
     path = "./"+_area+"/"+_maptype+"/"+_zoom+"/"
-    print(path)
 
     #convert PNG to PPM
     images = getFile(path)
@@ -30,6 +39,8 @@ def makeGeoJson(_area,_maptype,_zoom,_type):
     cnt = 0
     for img in images:
         img_file = Image.open(path+img)
+        img_file = img_file.convert("RGBA")
+        
         #img_file = removeColor(img_file) #remove other color
          #remove and replace color
         if _type == 'road':
@@ -43,13 +54,19 @@ def makeGeoJson(_area,_maptype,_zoom,_type):
         elif _type == 'building':        
             img_file = replaceColor(img_file,0,255,0,0)
             img_file = replaceColor(img_file,0,0,255,0)
-            
-        img_file = Image.eval(img_file, lambda x : 256 - x) #invert image
+        elif _type == 'building2':
+            img_file = removeOtherColor(img_file,0,116,194)
+            '''
+            img_file = replaceColor(img_file,255,255,255,0)
+            img_file = replaceColor(img_file,0,255,0,0)            
+            img_file = replaceColor(img_file,0,0,255,255)
+            '''
+        #img_file = Image.eval(img_file, lambda x : 256 - x) #invert image
 
         newName = img[0:len(img)-4]+'.ppm'
         img_file.save('./ppm/'+newName)
         cnt += 1
-        print (img+' converted to '+newName+' {0:.1f}%'.format(cnt / len(images) * 100))  
+        print (img+' converted to '+newName+' {0:.1f}%'.format(cnt / len(images) * 100))
         
         #os.system('convert ./input/'+img+' '+newName)
         #os.system('mv ./'+newName+' '+'./ppm')
@@ -88,7 +105,7 @@ def makeGeoJson(_area,_maptype,_zoom,_type):
         print (img+' converted to '+newName+' {0:.1f}%'.format(cnt / len(images) * 100))  
         
     #delete temp files
-    os.system('rm -r ./ppm ')
+    #os.system('rm -r ./ppm ')
     print ('done')
     
 if __name__ == "__main__":

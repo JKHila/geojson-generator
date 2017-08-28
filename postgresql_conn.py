@@ -48,7 +48,7 @@ def makePolygon(data,i): #각 geometry 안에 있는 coordinate의 x,y추출해 
 def sendDB(area,maptype,zoom,tolerance,_type,local,dbNum):
     if _type =="road":
         oDbName = "origin_road"
-    elif _type == "building":
+    elif _type == "building" or _type == "building2":
         oDbName = "origin_building"
 
     sendQuery("DELETE FROM public."+oDbName,local) #init db
